@@ -18,3 +18,4 @@ src/__pycache__/test_textnode.cpython-312.pyc
 src/__pycache__/textnode.cpython-312.pyc
 .idea/.gitignore
 src/__pycache__/block_markdown.cpython-312.pyc
+public/
