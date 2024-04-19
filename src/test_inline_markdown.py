@@ -1,6 +1,8 @@
 import unittest
 from inline_markdown import (
     split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links
 )
 
 from textnode import (
@@ -79,6 +81,63 @@ class TestInlineMarkdown(unittest.TestCase):
             new_nodes,
         )
 
+    def test_extract_image_noimage(self):
+        text = "012[image1](linktoimage1)abc[](linktoimage2)xyz"
+        images = extract_markdown_images(text)
+        self.assertListEqual(
+            images,
+            []
+        )
+
+    def test_extract_image_image(self):
+        text = "012![image1](linktoimage1)abc"
+        images = extract_markdown_images(text)
+        self.assertListEqual(
+            images,
+            [
+                ('image1', 'linktoimage1'), 
+            ]
+        )
+
+    def test_extract_image_multiimage(self):
+        text = "012![image1](linktoimage1)abc![image2](linktoimage2)xyz"
+        images = extract_markdown_images(text)
+        self.assertListEqual(
+            images,
+            [
+                ('image1', 'linktoimage1'), 
+                ('image2', 'linktoimage3')
+            ]
+        )
+
+    def test_extract_image_nolink(self):
+        text = "012[link1(url1)abc(url1)xyz"
+        links = extract_markdown_links(text)
+        self.assertListEqual(
+            links,
+            []
+        )
+
+    def test_extract_image_image(self):
+        text = "012[link1](url1)abc"
+        links = extract_markdown_links(text)
+        self.assertListEqual(
+            links,
+            [
+                ('link1', 'url1'), 
+            ]
+        )
+
+    def test_extract_image_multiimage(self):
+        text = "012[link1](url1)abc[link2](url2)xyz"
+        links = extract_markdown_links(text)
+        self.assertListEqual(
+            links,
+            [
+                ('link1', 'url1'), 
+                ('link2', 'url2')
+            ]
+        )
 
 if __name__ == "__main__":
     unittest.main()
