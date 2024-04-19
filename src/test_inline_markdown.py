@@ -4,7 +4,8 @@ from inline_markdown import (
     extract_markdown_images,
     extract_markdown_links, 
     split_nodes_image,
-    split_nodes_link
+    split_nodes_link,
+    text_to_textnodes
 )
 
 from textnode import (
@@ -579,6 +580,40 @@ class TestInlineMarkdown(unittest.TestCase):
             ],
             new_nodes,
         )
+        
+    def test_text_to_textnodes(self):
+        """
+        Test the `text_to_textnodes` function by passing in a sample text string and asserting that the returned list of `TextNode` objects matches the expected list.
+
+        This test case checks if the `text_to_textnodes` function correctly converts the given text string into a list of `TextNode` objects. It verifies that the function correctly identifies and formats different types of inline text, such as bold, italic, code, image, and link.
+
+        The test case passes if the returned list of `TextNode` objects matches the expected list.
+
+        Parameters:
+            self: The test case instance.
+
+        Returns:
+            None
+        """
+        nodes = text_to_textnodes(
+            "This is **text** with an *italic* word and a `code block` and an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link](https://boot.dev)"
+        )
+        self.assertListEqual(
+            [
+                TextNode("This is ", text_type_text),
+                TextNode("text", text_type_bold),
+                TextNode(" with an ", text_type_text),
+                TextNode("italic", text_type_italic),
+                TextNode(" word and a ", text_type_text),
+                TextNode("code block", text_type_code),
+                TextNode(" and an ", text_type_text),
+                TextNode("image", text_type_image, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and a ", text_type_text),
+                TextNode("link", text_type_link, "https://boot.dev"),
+            ],
+            nodes,
+        )
+
         
 
 if __name__ == "__main__":
