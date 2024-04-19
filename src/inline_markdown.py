@@ -212,4 +212,58 @@ def split_nodes_link(old_nodes):
     
     return new_nodes
 
+def text_to_textnodes(text):
+    """
+    Convert a given text into a list of inline TextNode objects.
 
+    Args:
+        text (str): The input text to be converted.
+
+    Returns:
+        list: A list of TextNode objects representing the converted text.
+    """
+    
+    node = TextNode(text, text_type_text)
+    nodes = split_nodes_delimiter([node], "**", text_type_bold)
+    nodes = split_nodes_delimiter(nodes, "*", text_type_italic)
+    nodes = split_nodes_delimiter(nodes, "`", text_type_code)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes
+
+
+
+
+# driver code
+text = "This is **text** with an *italic* word and a `code block` and an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and a [link](https://boot.dev)"
+new_node = text_to_textnodes(text)
+print(new_node)
+
+# Expected: 
+# [
+#   TextNode("This is ", text_type_text),
+#   TextNode("text", text_type_bold),
+#   TextNode(" with an ", text_type_text), 
+#   TextNode("italic", text_type_italic),
+#   TextNode(" word and a ", text_type_text),   
+#   TextNode("code block", text_type_code),
+#   TextNode(" and an ", text_type_text),
+#   TextNode("image", text_type_image, "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
+#   TextNode(" and a ", text_type_text),
+#   TextNode("link", text_type_link, "https://boot.dev"),
+# ]
+
+
+# logs: 
+# [
+#   TextNode(This is , text, None), 
+#   TextNode(text, bold, None), 
+#   TextNode( with an , text, None), 
+#   TextNode(italic, italic, None), 
+#   TextNode( word and a , text, None), 
+#   TextNode(code block, code, None), 
+#   TextNode( and an , text, None), 
+#   TextNode(image, image, https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png), 
+#   TextNode( and a , text, None), 
+#   TextNode(link, link, https://boot.dev)
+# ]
