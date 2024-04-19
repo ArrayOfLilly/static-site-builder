@@ -1,6 +1,6 @@
 import unittest
 
-from block_markdown import markdown_to_blocks
+from markdown_block import markdown_to_blocks
 
 
 # unit test class for testing the functionality of the block markdown
