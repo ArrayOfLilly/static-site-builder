@@ -1,4 +1,3 @@
-import re
 from textnode import text_node_to_html_node
 from htmlnode import ParentNode
 from inline_markdown import text_to_textnodes
@@ -361,9 +360,32 @@ def block_to_html_node(block):
 
 
 def markdown_to_html_node(markdown):
+    """
+    Convert a markdown string to an HTML node tree.
+
+    Args:
+        markdown (str): The markdown string to be converted.
+
+    Returns:
+        ParentNode: The root node of the HTML node tree.
+
+    This function takes a markdown string as input and converts it into an HTML node tree. It first splits the markdown
+    string into blocks using the `markdown_to_blocks` function. Then, it iterates over each block and converts it into an
+    HTML node using the `block_to_html_node` function. The resulting HTML nodes are collected into a list called `children`.
+    Finally, a `ParentNode` with the tag name "div" and the `children` list is returned, representing the root node of the
+    HTML node tree.
+
+    Example:
+        >> markdown_to_html_node("# Heading\nThis is a paragraph.")
+        ParentNode("div", [ParentNode("h1", [LeafNode(None, "Heading")]), ParentNode("p", [LeafNode(None, "This is a paragraph.")])])
+    """
     blocks = markdown_to_blocks(markdown)
     children = []
     for block in blocks:
         node = block_to_html_node(block)
         children.append(node)
     return ParentNode("div", children)
+
+
+
+

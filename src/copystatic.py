@@ -1,7 +1,11 @@
 import os.path as path
+
 from os import scandir, mkdir, remove
 from shutil import copy, rmtree
 from datetime import datetime as dt
+from markdown_block import markdown_to_html_node
+from inline_markdown import extract_markdown_images, extract_markdown_links
+
 
 def copy_static_to_public(src, dst):
     """
@@ -18,6 +22,7 @@ def copy_static_to_public(src, dst):
     Returns:
         None
     """
+    print("Copying static files to public directory...")
     items = scandir(src)
     for item in items:
         cur_src = path.join(src, item.name)
@@ -46,6 +51,7 @@ def delete_directory(target):
     Returns:
         None
     """
+    print("Deleting public directory...")
     items = scandir(target)
     for item in items:
         if item.is_dir():
@@ -56,3 +62,5 @@ def delete_directory(target):
     
     with open("./logs/copy_log.txt", "a") as file:
         file.write(f"\nNewly created at {dt.now()}")
+
+    
