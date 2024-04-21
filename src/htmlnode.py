@@ -1,6 +1,9 @@
+from pprint import pprint
+
 # base class for creating HTML nodes
 # defines the structure and behavior of an HTML node in a hierarchical manner
 class HTMLNode:
+
     def __init__(self, tag=None, value=None, children=None, props=None):
         """
         Initializes a new instance of the HTMLNode class.
@@ -18,7 +21,6 @@ class HTMLNode:
         self.children = children
         self.props = props
 
-
     def to_html(self):
         """
         Generates the HTML representation of the current object.
@@ -33,15 +35,16 @@ class HTMLNode:
         """
         Generates the HTML representation of the attributes of the current object.
 
-        :return: A string containing the HTML representation of the attributes of the current object as key, value pairs.
+        :return: A string containing the HTML representation of the attributes of the current object as key,
+        value pairs.
         :rtype: str
         """
         # if props contains values
         if self.props:
             attributes = ""
-            
+
             for prop in self.props:
-                attributes += f" {prop}=\"{self.props[prop]}\"" 
+                attributes += f" {prop}=\"{self.props[prop]}\""
             return attributes
 
         # if props does not contains values
@@ -57,9 +60,10 @@ class HTMLNode:
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
 
 
-# subclass of HTMLNode, represents a single HTML element 
+# subclass of HTMLNode, represents a single HTML element
 # it does not contain any other HTML elements
 class LeafNode(HTMLNode):
+
     def __init__(self, tag, value, props=None):
         """
         Initializes a new instance of the LeafNode class.
@@ -86,6 +90,7 @@ class LeafNode(HTMLNode):
         if self.tag is None:
             return self.value
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+    
 
     def __repr__(self):
         """
@@ -97,9 +102,10 @@ class LeafNode(HTMLNode):
         return f"LeafNode({self.tag}, {self.value}, {self.props})"
 
 
-# subclass of HTMLNode, represents an HTML element 
+# subclass of HTMLNode, represents an HTML element
 # it contains other HTML elements, does not have own value
 class ParentNode(HTMLNode):
+
     def __init__(self, tag, children, props=None):
         """
         Initializes a new instance of the ParentNode class.
@@ -127,13 +133,13 @@ class ParentNode(HTMLNode):
         # should have children
         if self.children is None:
             raise ValueError("Invalid HTML: no HTMLContent")
-        
+
         inner_html = ""
 
         # recursively call it for all of it's children
         for child in self.children:
             inner_html += child.to_html()
-        # opening tag with attributes, innerHTML (childrens), closing tag
+        # opening tag with attributes, innerHTML (children), closing tag
         return f"<{self.tag}{self.props_to_html()}>{inner_html}</{self.tag}>"
 
     def __repr__(self):

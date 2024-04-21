@@ -3,8 +3,6 @@ import os.path as path
 from os import scandir, mkdir, remove
 from shutil import copy, rmtree
 from datetime import datetime as dt
-from markdown_block import markdown_to_html_node
-from inline_markdown import extract_markdown_images, extract_markdown_links
 
 
 def copy_static_to_public(src, dst):
@@ -22,25 +20,40 @@ def copy_static_to_public(src, dst):
     Returns:
         None
     """
-    print("Copying static files to public directory...")
+    print(f"Copying static files from {src} to {dst} directory...")
+    
+    with open("./logs/copy_log.txt", "a") as file:
+        file.write(f"\nCopying static files from {src} to {dst} started at {dt.now()}\n")
+        
     items = scandir(src)
+    
     for item in items:
         cur_src = path.join(src, item.name)
         cur_dst = path.join(dst, item.name)
-        print(f"src: {cur_src}, dst: {cur_dst}")
+        
+        # print(f"  src: {cur_src}, dst: {cur_dst}")
+        
         if item.is_file():
-            if not path.exists(cur_dst):
+            if not path.exists(cur_dst) and item.name != ".DS_Store":
                 copy(cur_src, cur_dst)
+                
                 with open("./logs/copy_log.txt", "a") as file:
-                    file.write(f"file copied from {cur_src} to {cur_dst}\n")
+                    file.write(f"   file copied from {cur_src} to {cur_dst} at {dt.now()}\n")
+                    
         if item.is_dir():
             if not path.exists(cur_dst):
                 mkdir(cur_dst)
+                
                 with open("./logs/copy_log.txt", "a") as file:
-                    file.write(f"directory created: {cur_dst}\n")
-            copy_static_to_public(cur_src, cur_dst)
-           
+                    file.write(f"   directory created: {cur_dst} at {dt.now()}\n")
+                    
+                copy_static_to_public(cur_src, cur_dst)
             
+    with open("./logs/copy_log.txt", "a") as file:
+        file.write(f"copying from {src} to {dst} successfully finished at {dt.now()}\n")
+                    
+    # print("Copying successfully finished")
+
 def delete_directory(target):
     """
     Deletes the specified target directory if it exists.
@@ -51,16 +64,23 @@ def delete_directory(target):
     Returns:
         None
     """
-    print("Deleting public directory...")
+    print(f"Deleting content of {target} directory...\n")
+    
+    with open("./logs/copy_log.txt", "a") as file:
+        file.write(f"\n\nCleaning {target} started at {dt.now()}\n")
+        
     items = scandir(target)
+    
     for item in items:
         if item.is_dir():
             cur_target = path.join(target, item.name)
             rmtree(cur_target)
         else:
             remove(item)
-    
+            
     with open("./logs/copy_log.txt", "a") as file:
-        file.write(f"\nNewly created at {dt.now()}")
-
+        file.write(f"cleaning {target} succesfully finished at {dt.now()}\n")
+            
+    # print("Deleting sucessfully finished")
+    
     

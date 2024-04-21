@@ -1,8 +1,8 @@
 import os.path as path
 
-from os import mkdir
+from os import mkdir, makedirs, scandir
+from datetime import datetime as dt
 from markdown_block import markdown_to_html_node
-
 
 def extract_title(markdown):
     """
@@ -56,7 +56,7 @@ def generate_page(from_path, template_path, dest_path):
     Finally, it writes the generated HTML to a file at the specified destination path,
     creating any necessary directories if they don't exist.
     """
-    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+    # print(f"Generating page from {from_path} to {dest_path} using {template_path}...")
 
     # generating html from markdown
     markdown = ""
@@ -71,14 +71,60 @@ def generate_page(from_path, template_path, dest_path):
     content = node.to_html()
     title = extract_title(markdown)
 
-    # generating new staic page from generated html and template
-    with open(template_path, "w") as file:
+    # generating new static page from generated html and template
+    with open(template_path, "r") as file:
         template = file.read()
 
     page = template.replace("{{ Title }}", title).replace("{{ Content }}", content)
 
     # Write the new HTML to a file at dest_path
-    if not path.exists(dest_path):
-        mkdir(dest_path)
+    dest_dir_path = path.dirname(dest_path)
+    
+    if dest_dir_path != "":
+        makedirs(dest_dir_path, exist_ok=True)
+        
     with open(dest_path, "w") as file:
-        file.wrtite(page)
+        file.write(page)
+        
+    with open("./logs/conversion_log.txt", "a") as file:
+            file.write(f"\n      static html converted from {from_path} to {dest_path} copied successfully at {dt.now()}\n")
+               
+    # print("Conversion successfully succeeded")
+    
+    
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    
+    print(f"Generating pages from {dir_path_content} to {dest_dir_path} using {template_path}...")
+
+    with open("./logs/conversion_log.txt", "a") as file:
+            if dir_path_content == "./content":
+                file.write(f"\n\nConversion session starting...") 
+            file.write(f"\n   Converting content of {dir_path_content} to {dest_dir_path} started...\n") 
+    
+    items = scandir(dir_path_content)
+    
+    for item in items:
+        cur_src = path.join(dir_path_content, item.name)
+        
+        if item.is_dir():
+            cur_dst = path.join(dest_dir_path, item.name)
+            mkdir(cur_dst)
+            
+            with open("./logs/conversion_log.txt", "a") as file:
+                file.write(f"      directory {cur_dst} created\n")
+                
+            generate_pages_recursive(cur_src, template_path, cur_dst)
+            
+        elif item.is_file() and item.name.endswith("md"):
+            new_file_name = item.name.replace("md", "html")
+            cur_dst = path.join(dest_dir_path, new_file_name)
+            generate_page(
+                cur_src,
+                template_path,
+                cur_dst
+                )
+            
+    with open("./logs/conversion_log.txt", "a") as file:
+            file.write(f"   converting content of {dir_path_content} to {dest_dir_path} successfully finished\n")
+    
+    # print("Conversion successfully succeeded")

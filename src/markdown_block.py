@@ -10,7 +10,6 @@ block_type_code = "code block"
 block_type_quote = "quote"
 
 
-
 def markdown_to_blocks(markdown):
     """
     Splits a given markdown string into blocks and returns a list of blocks.
@@ -23,7 +22,7 @@ def markdown_to_blocks(markdown):
     """
     raw_blocks = markdown.split("\n\n")
     blocks = []
-    
+
     for block in raw_blocks:
         if block != "":
             blocks.append(block.strip())
@@ -45,19 +44,19 @@ def block_to_block_type(block):
         ValueError: If the block is a code block but does not have the required closing symbols.
 
     """
-    lines = block.split("\n")        
-    
+    lines = block.split("\n")
+
     # headings
     if (
-        block.startswith("# ")
-        or block.startswith("## ")
-        or block.startswith("### ")
-        or block.startswith("#### ")
-        or block.startswith("##### ")
-        or block.startswith("###### ")
+            block.startswith("# ")
+            or block.startswith("## ")
+            or block.startswith("### ")
+            or block.startswith("#### ")
+            or block.startswith("##### ")
+            or block.startswith("###### ")
     ):
         return block_type_heading
-    
+
     # unordered list
     if block.startswith("* "):
         for line in lines:
@@ -70,14 +69,14 @@ def block_to_block_type(block):
             if not line.startswith("- "):
                 return block_type_paragraph
         return block_type_unordered_list
-    
+
     # ordered list
     # if re.match(r"^\d+\.\s", block):
     #    for line in lines:
     #        if not lre.match(r"^\d+\.\s", block):
     #            return block_type_paragraph
-    #    return block_type_ordered_list 
-    
+    #    return block_type_ordered_list
+
     # ordered list
     if block.startswith("1. "):
         i = 1
@@ -86,7 +85,7 @@ def block_to_block_type(block):
                 return block_type_paragraph
             i += 1
         return block_type_ordered_list
-    
+
     # code block
     if len(lines) > 1 and block.startswith("```"):
         if block.endswith("```"):
@@ -96,24 +95,24 @@ def block_to_block_type(block):
     # quote block
     if block.startswith(">"):
         return block_type_quote
-    
+
     # apragraph
     return block_type_paragraph
-    
+
 
 def text_to_children(text):
     """
     Convert a given text into a list of HTML nodes.
-    
+
     Args:
         text (str): The input text to be converted.
-        
+
     Returns:
         list: A list of HTML nodes representing the converted text.
     """
     text_nodes = text_to_textnodes(text)
     children = []
-    
+
     for text_node in text_nodes:
         html_node = text_node_to_html_node(text_node)
         children.append(html_node)
@@ -199,7 +198,8 @@ def unordered_list_to_html_node(block):
 
     Example:
         >> unordered_list_to_html("- Item 1\n- Item 2\n- Item 3")
-        ParentNode("ul", [ParentNode("li", [LeafNode(None, "Item 1")]), ParentNode("li", [LeafNode(None, "Item 2")]), ParentNode("li", [LeafNode(None, "Item 3")])])
+        ParentNode("ul", [ParentNode("li", [LeafNode(None, "Item 1")]), ParentNode("li", [LeafNode(None, "Item 2")]),
+        ParentNode("li", [LeafNode(None, "Item 3")])])
     """
     list_items = block.split("\n")
     html_items = []
@@ -229,7 +229,8 @@ def ordered_list_to_html_node(block):
 
     Example:
         >> ordered_list_to_html("1. Item 1\n2. Item 2\n3. Item 3")
-        ParentNode("ol", [ParentNode("li", [LeafNode(None, "Item 1")]), ParentNode("li", [LeafNode(None, "Item 2")]), ParentNode("li", [LeafNode(None, "Item 3")])])
+        ParentNode("ol", [ParentNode("li", [LeafNode(None, "Item 1")]), ParentNode("li", [LeafNode(None, "Item 2")]),
+        ParentNode("li", [LeafNode(None, "Item 3")])])
     """
     list_items = block.split("\n")
     html_items = []
@@ -256,9 +257,11 @@ def code_to_html_node(block):
     Raises:
         ValueError: If the code block is invalid (does not start with "```" or does not end with "```").
 
-    This function takes a markdown code block as input and converts it into an HTML code block. It checks if the code block
+    This function takes a markdown code block as input and converts it into an HTML code block. It checks if the code
+    block
     starts with "```" and ends with "```". If not, it raises a ValueError. It then extracts the code text from the block
-    and converts it into a list of HTML nodes using the `text_to_children` function. Finally, it creates an HTML code block
+    and converts it into a list of HTML nodes using the `text_to_children` function. Finally, it creates an HTML code
+    block
     node with the children and returns it.
 
     Example:
@@ -269,7 +272,7 @@ def code_to_html_node(block):
         raise ValueError("Invalid code block")
     text = block[4:-3]
     children = text_to_children(text)
-    return ParentNode("pre", ParentNode("code", children))
+    return ParentNode("pre", [ParentNode("code", children)])
 
 
 def quote_to_html_node(block):
@@ -301,7 +304,7 @@ def quote_to_html_node(block):
         if not line.startswith(">"):
             raise ValueError("Invalid quote block")
         new_lines.append(line.lstrip(">").strip())
-        
+
     text = " ".join(new_lines)
     children = text_to_children(text)
     return ParentNode("blockquote", children)
@@ -320,8 +323,8 @@ def block_to_html_node(block):
     Raises:
         ValueError: If the block type is invalid.
 
-    This function takes a block of text as input and determines its type based on the `block_to_block_type` function. 
-    It then converts the block to an HTML node based on its type using the appropriate conversion function. 
+    This function takes a block of text as input and determines its type based on the `block_to_block_type` function.
+    It then converts the block to an HTML node based on its type using the appropriate conversion function.
     The supported block types are:
     - Paragraph: `paragraph_to_html_node`
     - Heading: `heading_to_html_node`
@@ -337,25 +340,25 @@ def block_to_html_node(block):
         ParentNode("h1", [LeafNode(None, "Heading")])
     """
     block_type = block_to_block_type(block)
-    
+
     if block_type == block_type_paragraph:
         return paragraph_to_html_node(block)
-    
+
     if block_type == block_type_heading:
         return heading_to_html_node(block)
-    
+
     if block_type == block_type_unordered_list:
         return unordered_list_to_html_node(block)
-    
+
     if block_type == block_type_ordered_list:
         return ordered_list_to_html_node(block)
-    
+
     if block_type == block_type_code:
         return code_to_html_node(block)
-    
+
     if block_type == block_type_quote:
         return quote_to_html_node(block)
-    
+
     raise ValueError("Invalid block type")
 
 
@@ -370,14 +373,18 @@ def markdown_to_html_node(markdown):
         ParentNode: The root node of the HTML node tree.
 
     This function takes a markdown string as input and converts it into an HTML node tree. It first splits the markdown
-    string into blocks using the `markdown_to_blocks` function. Then, it iterates over each block and converts it into an
-    HTML node using the `block_to_html_node` function. The resulting HTML nodes are collected into a list called `children`.
-    Finally, a `ParentNode` with the tag name "div" and the `children` list is returned, representing the root node of the
+    string into blocks using the `markdown_to_blocks` function. Then, it iterates over each block and converts it
+    into an
+    HTML node using the `block_to_html_node` function. The resulting HTML nodes are collected into a list called
+    `children`.
+    Finally, a `ParentNode` with the tag name "div" and the `children` list is returned, representing the root node
+    of the
     HTML node tree.
 
     Example:
         >> markdown_to_html_node("# Heading\nThis is a paragraph.")
-        ParentNode("div", [ParentNode("h1", [LeafNode(None, "Heading")]), ParentNode("p", [LeafNode(None, "This is a paragraph.")])])
+        ParentNode("div", [ParentNode("h1", [LeafNode(None, "Heading")]), ParentNode("p", [LeafNode(None, "This is a
+        paragraph.")])])
     """
     blocks = markdown_to_blocks(markdown)
     children = []
@@ -385,7 +392,3 @@ def markdown_to_html_node(markdown):
         node = block_to_html_node(block)
         children.append(node)
     return ParentNode("div", children)
-
-
-
-
